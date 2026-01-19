@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ტექსტის რედაქტირება</title>
+    
+    <!-- External Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans Georgian', sans-serif;
+            background-color: #f8fafc;
+        }
+        .font-serif-georgian {
+            font-family: 'Noto Sans Georgian', serif;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake {
+            animation: shake 0.3s ease-in-out;
+        }
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const FORMSPREE_URL = 'https://formspree.io/f/xovnbldd';
+
+        const UNEDITED_TEXT = `შალვა ქიქოძე 1895 წელს დაიბადა სოფელ ბახვში. თბილისის გიმნაზიის დამთავრების შემდეგ ნიჭიერ ახალგაზრდას  წერა-კითხვის გამავრცელებელმა საზოგადოებამ სტიპენდია დაუნიშნა და იგი მოსკოვის უნივერსიტეტის იურიდიულ ფაკულტეტის სტუდენტი გახდა. 1916 წელს შალვა ქიქოძის ჩარიცხვა მოხდა მოსკოვის სამხატვრო სასწავლებელში, კერძოდ ფერწერის ჯგუფში.  
+არდადეგებზე საქართველოში ჩამოსული ქიქოძე დაუკავშირდა ქართველ ხელოვანთა საზოგადოებას რის დამფუძნებელიც იყო მისი უფროსი მეგობარი დიმიტრი შევარდნაძე. შალვა აქტიურათ ჩაერთო საზოგადოების საქმიანობაში.  
+ქიქოძემ მონაწილეობა მიიღო საქართველოს საისტორიო-საეთნოგრაფიო და ქართველ ხელოვანთა საზოგადოებების მიერ ერთობლივად მოწყობილ პირველ ექსპედიციაში რადგან კულტურული მემკვიდრეობის უკეთ შესწავლის შესაძლებლობა მიცემოდა. ექსპედიციის მონაწილეები ძეგლებს წმინდავდნენ და კედლის მხატვრობას ეცნობოდნენ. შალვამ იმუშავა მე-XV საუკუნის ძეგლის, ნაბახტევის ეკლესიის ფრესკების ასლების გადმოღებაზე. მხატვარმა ცხენით შემოიარა საქართველოს კუთხეები ფშავ-ხევსურეთი, კახეთი, აჭარა.  
+1920 წელს შალვა ქიქოძე, როგორც სხვა ნიჭიერი ახალგაზრდა მხატვრები ქართველ ხელოვანთა საზოგადოების მიერ დანიშნული სტიპენდიით სასწავლებლად პარიზში გაემგზავრა. აქ მან მონაწილეობა მიიღო დამოუკიდებელ მხატვართა საზოგადოების ყოველწლიურ გამოფენაში. მისი ნამუშევრები გამოფენილი იყო პარიზის სხვადასხვა სამხატვრო გალერეაში.`;
+
+        const CORRECT_TEXT = `შალვა ქიქოძე 1895 წელს დაიბადა სოფელ ბახვში. თბილისის გიმნაზიის დამთავრების შემდეგ ნიჭიერ ახალგაზრდას  წერა-კითხვის გამავრცელებელმა საზოგადოებამ სტიპენდია დაუნიშნა და იგი მოსკოვის უნივერსიტეტის იურიდიული ფაკულტეტის სტუდენტი გახდა. 1916 წელს შალვა ქიქოძის ჩაირიცხა მოსკოვის სამხატვრო სასწავლებელში, კერძოდ, ფერწერის ჯგუფში.  
+არდადეგებზე საქართველოში ჩამოსული ქიქოძე დაუკავშირდა ქართველ ხელოვანთა საზოგადოებას, რომლის დამფუძნებელიც იყო მისი უფროსი მეგობარი დიმიტრი შევარდნაძე. შალვა აქტიურად ჩაერთო საზოგადოების საქმიანობაში.  
+ქიქოძემ მონაწილეობა მიიღო საქართველოს საისტორიო-საეთნოგრაფიო და ქართველ ხელოვანთა საზოგადოებების მიერ ერთობლივად მოწყობილ პირველ ექსპედიციაში, რათა კულტურული მემკვიდრეობის უკეთ შესწავლის შესაძლებლობა მისცემოდა. ექსპედიციის მონაწილეები ძეგლებს წმენდდნენ და კედლის მხატვრობას ეცნობოდნენ. შალვამ იმუშავა XV საუკუნის ძეგლის, ნაბახტევის ეკლესიის, ფრესკების ასლების გადმოღებაზე. მხატვარმა ცხენით შემოიარა საქართველოს კუთხეები: ფშავ-ხევსურეთი, კახეთი, აჭარა.  
+1920 წელს შალვა ქიქოძე, როგორც სხვა ნიჭიერი ახალგაზრდა მხატვრები, ქართველ ხელოვანთა საზოგადოების მიერ დანიშნული სტიპენდიით სასწავლებლად პარიზში გაემგზავრა. აქ მან მონაწილეობა მიიღო დამოუკიდებელ მხატვართა საზოგადოების ყოველწლიურ გამოფენაში. მისი ნამუშევრები გამოფენილი იყო პარიზის სხვადასხვა სამხატვრო გალერეაში.`;
+
+        const App = () => {
+            const [fullName, setFullName] = useState('');
+            const [isStarted, setIsStarted] = useState(false);
+            const [studentText, setStudentText] = useState(UNEDITED_TEXT);
+            const [isSubmitting, setIsSubmitting] = useState(false);
+            const [status, setStatus] = useState('idle');
+
+            const getSentences = (text) => {
+                const matches = text.match(/[^.!?\n]+[.!?]?/g);
+                return (matches || [])
+                    .map(s => s.trim())
+                    .filter(s => s.length > 0);
+            };
+
+            const generateReport = (student, correct) => {
+                const studentSentences = getSentences(student);
+                const correctSentences = getSentences(correct);
+                
+                let report = `ნამუშევრის ანალიზი (შალვა ქიქოძე):\n\n`;
+                
+                correctSentences.forEach((correctSentence, index) => {
+                    const studentSentence = studentSentences[index] || "";
+                    
+                    const normStudent = studentSentence.replace(/\s+/g, ' ').trim();
+                    const normCorrect = correctSentence.replace(/\s+/g, ' ').trim();
+
+                    if (normStudent === normCorrect) {
+                        report += `✅ სწორია:\n   ${studentSentence}\n\n`;
+                    } else {
+                        report += `❌ შეცდომაა:\n   მოსწავლის: ${studentSentence || '[გამოტოვებულია]'}\n   უნდა იყოს: ${correctSentence}\n\n`;
+                    }
+                });
+
+                return report;
+            };
+
+            const handleStart = (e) => {
+                e.preventDefault();
+                if (!fullName.trim()) return;
+                setIsStarted(true);
+            };
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setIsSubmitting(true);
+                setStatus('idle');
+
+                const report = generateReport(studentText, CORRECT_TEXT);
+
+                const payload = {
+                    "სტუდენტი": fullName,
+                    "ანალიზი": report,
+                    "სრული_ტექსტი_ნამუშევარი": studentText,
+                    "_subject": `შალვა ქიქოძე - დავალება: ${fullName}`,
+                };
+
+                try {
+                    const response = await fetch(FORMSPREE_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify(payload),
+                    });
+                    setStatus(response.ok ? 'success' : 'error');
+                } catch (error) {
+                    setStatus('error');
+                } finally {
+                    setIsSubmitting(false);
+                }
+            };
+
+            if (!isStarted) {
+                return (
+                    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
+                        <div className="max-w-md w-full bg-white shadow-2xl rounded-3xl p-8 md:p-10 border border-slate-100 text-center space-y-8 animate-in fade-in zoom-in duration-500">
+                            <h1 className="text-3xl font-bold text-slate-800 tracking-tight">დავალება</h1>
+                            <p className="text-slate-500">გთხოვთ მიუთითოთ თქვენი სახელი დავალების დასაწყებად</p>
+                            <form onSubmit={handleStart} className="space-y-6 text-left">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-slate-600 uppercase tracking-wider ml-1">სახელი და გვარი</label>
+                                    <input
+                                        type="text" autoFocus required
+                                        className="w-full px-4 py-4 border-2 border-slate-100 rounded-2xl focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all text-xl shadow-sm"
+                                        placeholder=""
+                                        value={fullName}
+                                        onChange={(e) => setFullName(e.target.value)}
+                                    />
+                                </div>
+                                <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl text-xl shadow-lg transform transition-all active:scale-95 hover:-translate-y-1">დაწყება</button>
+                            </form>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="min-h-screen p-4 md:p-8 flex flex-col items-center animate-in fade-in duration-500">
+                    <header className="max-w-4xl w-full mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div className="text-center md:text-left">
+                            <h1 className="text-2xl font-bold text-slate-800">ტექსტის რედაქტირება</h1>
+                            <p className="text-slate-500">გაასწორეთ შეცდომები და დააჭირეთ გაგზავნას</p>
+                        </div>
+                        <div className="bg-white px-6 py-3 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-3">
+                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                            <span className="font-semibold text-slate-700">{fullName}</span>
+                        </div>
+                    </header>
+
+                    <main className="max-w-4xl w-full bg-white shadow-2xl rounded-3xl overflow-hidden border border-slate-100">
+                        <form onSubmit={handleSubmit} className="p-6 md:p-10 space-y-8">
+                            <div className="flex flex-col space-y-3">
+                                <label className="text-sm font-bold text-slate-600 uppercase tracking-wider ml-1 flex justify-between">
+                                    <span>სარედაქტირებელი ტექსტი</span>
+                                    <span className="text-xs font-normal text-slate-400 italic">ჩაასწორეთ პირდაპირ აქ</span>
+                                </label>
+                                <textarea
+                                    spellCheck={false}
+                                    className="w-full h-[550px] p-6 border-2 border-slate-100 rounded-2xl bg-slate-50 focus:bg-white text-xl leading-relaxed text-slate-800 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 outline-none transition-all resize-none font-serif-georgian shadow-inner"
+                                    value={studentText}
+                                    onChange={(e) => setStudentText(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="flex flex-col items-center pt-6 border-t border-slate-100">
+                                {status === 'success' && <div className="mb-6 w-full p-4 bg-green-50 text-green-800 rounded-xl border-2 border-green-100 text-center font-bold animate-in zoom-in">ნამუშევარი წარმატებით გაიგზავნა!</div>}
+                                {status === 'error' && <div className="mb-6 w-full p-4 bg-red-50 text-red-800 rounded-xl border-2 border-red-100 text-center font-bold animate-shake">შეცდომა გაგზავნისას. სცადეთ თავიდან.</div>}
+                                
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting || status === 'success'}
+                                    className={`w-full md:w-auto px-16 py-4 rounded-2xl font-bold text-xl shadow-xl transform transition-all active:scale-95 ${isSubmitting ? 'bg-slate-300 text-slate-500 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 text-white hover:-translate-y-1'}`}
+                                >
+                                    {isSubmitting ? 'იგზავნება...' : status === 'success' ? 'გაგზავნილია ✓' : 'ნამუშევრის გაგზავნა'}
+                                </button>
+                            </div>
+                        </form>
+                    </main>
+                    <footer className="mt-10 text-slate-400 text-sm">© {new Date().getFullYear()} საგანმანათლებლო პლატფორმა</footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
